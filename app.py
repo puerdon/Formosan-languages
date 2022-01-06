@@ -1,10 +1,12 @@
 import pandas as pd
+import base64
 import streamlit as st
 import streamlit.components.v1 as components
 import re
 from pandas_profiling import ProfileReport
 
 def main():
+  st.set_page_config(layout="wide")
   st.title("台灣南島語-華語句庫資料集")
   st.subheader("Dataset of Formosan-Mandarin sentence pairs")
   st.markdown(
@@ -15,14 +17,11 @@ def main():
 - 🎢 資料集合計約13萬筆台灣南島語-華語句對
 - ⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有
 
-### 資料來源
-- 以下資料經由網路爬蟲取得。
-   + 🥅 九階教材: [族語E樂園](http://web.klokah.tw)
-   + 💬 生活會話: [族語E樂園](http://web.klokah.tw)
-   + 🧗 句型: [族語E樂園](http://web.klokah.tw)
-   + 🔭 文法: [臺灣南島語言叢書](https://alilin.apc.gov.tw/tw/)
-- 詞典資料使用`PDFMiner` 將2019版的PDF檔轉成HTML，再用`BeautifulSoup`抓取句對，偶爾會出現族語跟華語對不上的情形。若發現錯誤，請[聯絡我📩](https://github.com/howard-haowen)。詞典中重複出現的句子已從資料集中刪除。
-   + 📚 詞典: [原住民族語言線上詞典](https://e-dictionary.apc.gov.tw/Index.htm?fbclid=IwAR18XBJPj2xs7nhpPlIUZ-P3joQRGXx22rbVcUvp14ysQu6SdrWYvo7gWCc)
+### 更新
+- 2022-01-06
+  - 加入《泰雅爾族傳說故事精選篇》 (Y&Y 1991)
+  - 新增下載 .csv 連結
+  - 將版面改為寬版，表格顯示全部文字
 
 ### 查詢方法
 - 🔭 過濾：使用左側欄功能選單可過濾資料來源(可多選)與語言，也可使用華語或族語進行關鍵詞查詢。
@@ -108,13 +107,17 @@ def main():
   # filter the data based on all criteria
   filt_df = df[(s_filt)&(l_filt)&(t_filt)]
   
+
+  st.markdown(get_table_download_link(filt_df), unsafe_allow_html=True)
+
   st.markdown(
     """
 ### 查詢結果
 """
 )
   # display the filtered data
-  st.dataframe(filt_df, 800, 400)
+  # st.dataframe(filt_df, 800, 400)
+  st.table(filt_df)
  
   st.markdown(
     """
@@ -142,6 +145,16 @@ def get_report():
   df = get_data()
   report = ProfileReport(df, title='Report', minimal=True).to_html()
   return report
+
+def get_table_download_link(df):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a download="result.csv" href="data:file/csv;base64,{b64}">Download csv file</a>'
+    return href
 
 if __name__ == '__main__':
   main()
