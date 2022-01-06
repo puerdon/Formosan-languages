@@ -128,7 +128,8 @@ def main():
 # Cache the raw data and profile report to speed up subseuqent requests 
 @st.cache
 def get_data():
-  df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
+  # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
+  df = pd.read_pickle('Formosan-Mandarin_sent_pairs_20220106.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
