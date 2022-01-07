@@ -4,6 +4,10 @@ import streamlit as st
 import streamlit.components.v1 as components
 import re
 from pandas_profiling import ProfileReport
+from st_aggrid import AgGrid
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+from st_aggrid.shared import JsCode
+
 
 def main():
   st.set_page_config(layout="wide")
@@ -17,12 +21,6 @@ def main():
 - 🎢 資料集合計約13萬筆台灣南島語-華語句對
 - ⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有
 
-### 更新
-- 2022-01-06
-  - 加入《泰雅爾族傳說故事精選篇》 (Y&Y 1991)
-  - 新增下載 .csv 連結
-  - 將版面改為寬版，表格顯示全部文字
-
 ### 查詢方法
 - 🔭 過濾：使用左側欄功能選單可過濾資料來源(可多選)與語言，也可使用華語或族語進行關鍵詞查詢。
   - 🔍 關鍵詞查詢支援[正則表達式](https://zh.wikipedia.org/zh-tw/正则表达式)。
@@ -33,8 +31,6 @@ def main():
     + 使用`^有一`查詢華語，能找到使用`有一天`、`有一塊`或`有一晚`等詞出現在句首的句子。
     + 使用`[0-9]{1,}`查詢華語，能找到包含羅馬數字的句子，如`我今年16歲了`。
 - 📚 排序：點選標題列。例如點選`族語`欄位標題列內的任何地方，資料集便會根據族語重新排序。
-- 💬 更多：文字長度超過欄寬時，將滑鼠滑到欄位上方即可顯示完整文字。
-- 🥅 放大：點選表格右上角↘️進入全螢幕模式，再次點選↘️返回主頁。
 
 """
 )
@@ -51,15 +47,15 @@ def main():
   sources = st.sidebar.multiselect(
         "請選擇資料來源",
         options=source_set,
-        default='詞典',)
+        default='傳說故事精選篇',)
   langs = st.sidebar.selectbox(
         "請選擇語言",
-        options=['布農','阿美','撒奇萊雅','噶瑪蘭','魯凱','排灣','卑南',
-                 '泰雅','賽德克','太魯閣','鄒','拉阿魯哇','卡那卡那富',
+        options=['泰雅','布農','阿美','撒奇萊雅','噶瑪蘭','魯凱','排灣','卑南',
+                 '賽德克','太魯閣','鄒','拉阿魯哇','卡那卡那富',
                  '邵','賽夏','達悟'],)
   texts = st.sidebar.radio(
         "請選擇關鍵詞查詢文字類別",
-        options=['華語','族語'],)
+        options=['族語','華語'],)
     
   # filter by sources
   s_filt = df['來源'].isin(sources)
@@ -106,9 +102,6 @@ def main():
   
   # filter the data based on all criteria
   filt_df = df[(s_filt)&(l_filt)&(t_filt)]
-  
-
-  st.markdown(get_table_download_link(filt_df), unsafe_allow_html=True)
 
   st.markdown(
     """
@@ -116,17 +109,45 @@ def main():
 """
 )
   # display the filtered data
-  # st.dataframe(filt_df, 800, 400)
-  st.table(filt_df)
- 
+  # st.dataframe(filt_df, width=1600, height=600)
+  # st.table(filt_df)
+
+  c = JsCode(
+  """
+  function(params) {
+    return params.data.族語;
+  }
+  """)
+
+  # add pagination to df
+  gb = GridOptionsBuilder.from_dataframe(filt_df)
+  gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+
+  large_font = { "font-size": "1.5em" }
+
+  if len(text_box) != 0:
+    gb.configure_column(texts, cellRenderer=dynamic_js_code(text_box))
+
+
+  # gb.configure_column("aa", valueGetter=c, cellRenderer=dynamic_js_code(text_box))
+  gb.configure_columns(filt_df.columns, cellStyle=large_font)
+  gridOptions = gb.build()
+  AgGrid(filt_df, gridOptions=gridOptions, allow_unsafe_jscode=True, height=650)
+
   st.markdown(
     """
-### 資料統計
+### 查詢結果下載
 """
 )
+  # download link for .csv file
+  st.markdown(get_table_download_link(filt_df), unsafe_allow_html=True)
+
+
+
+  # st.markdown("""### 資料統計""")
   # display a data profile report
-  report = get_report()
-  components.html(report, width=800, height=800, scrolling=True)  
+  # report = get_report()
+  # components.html(report, width=800, height=800, scrolling=True)  
   
 # Cache the raw data and profile report to speed up subseuqent requests 
 @st.cache
@@ -153,8 +174,20 @@ def get_table_download_link(df):
     """
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a download="result.csv" href="data:file/csv;base64,{b64}">Download csv file</a>'
+    href = f'<a download="result.csv" href="data:file/csv;base64,{b64}">點此下載查詢結果 (CSV檔)</a>'
     return href
+
+def dynamic_js_code(text):
+  x = """
+  function(params) {{
+    var re = /{0}/gi;
+    console.log(params.value);
+    var news = params.value.replace(re, '<span style="background-color: #f7cac9;">$&</span>');
+    return news;
+  }}
+  """.format(text)
+
+  return JsCode(x)
 
 if __name__ == '__main__':
   main()
