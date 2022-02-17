@@ -50,9 +50,10 @@ def main():
         default='傳說故事精選篇',)
   langs = st.sidebar.selectbox(
         "請選擇語言",
-        options=['泰雅','布農','阿美','撒奇萊雅','噶瑪蘭','魯凱','排灣','卑南',
-                 '賽德克','太魯閣','鄒','拉阿魯哇','卡那卡那富',
-                 '邵','賽夏','達悟'],)
+        #options=['泰雅','布農','阿美','撒奇萊雅','噶瑪蘭','魯凱','排灣','卑南',
+        #         '賽德克','太魯閣','鄒','拉阿魯哇','卡那卡那富',
+        #         '邵','賽夏','達悟'],)
+        options=['泰雅'],)
   texts = st.sidebar.radio(
         "請選擇關鍵詞查詢文字類別",
         options=['族語','華語'],)
@@ -153,7 +154,7 @@ def main():
 @st.cache
 def get_data():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('Formosan-Mandarin_sent_pairs_20220106.pkl', compression="gzip")
+  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20220216.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
