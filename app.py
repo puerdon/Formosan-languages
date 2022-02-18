@@ -17,9 +17,9 @@ def main():
     """
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
 
-### 資料概要
-- 🎢 資料集合計約13萬筆台灣南島語-華語句對
-- ⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有
+### 資料概要 (⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有)
+- Y&Y 1991: 傳說故事精選輯
+- Rau 1992: Atayal texts with English tranaslation
 
 ### 查詢方法
 - 🔭 過濾：使用左側欄功能選單可過濾資料來源(可多選)與語言，也可使用華語或族語進行關鍵詞查詢。
