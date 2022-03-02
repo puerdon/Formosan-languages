@@ -20,6 +20,8 @@ def main():
 ### 資料概要
 - Y&Y 1991: 傳說故事精選輯
 - Rau 1992: Atayal texts with English tranaslation
+- Huang 1994: Ergativity in Atayal
+- 泰雅族大嵙崁群的部落故事 (尚未完整)
 
 (⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有)
 
@@ -156,7 +158,7 @@ def main():
 @st.cache
 def get_data():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20220216.pkl', compression="gzip")
+  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20220302.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
