@@ -3,3 +3,4 @@ pandas
 pandas_profiling 
 jupyterlab-git
 streamlit-aggrid
+XlsxWriter
