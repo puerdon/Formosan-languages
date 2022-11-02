@@ -8,6 +8,8 @@ from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
 
+import xlsxwriter
+from io import BytesIO
 
 def main():
   st.set_page_config(layout="wide")
@@ -51,7 +53,7 @@ def main():
   sources = st.sidebar.multiselect(
         "請選擇資料來源",
         options=source_set,
-        default='傳說故事精選篇',)
+        default=list(source_set))
   langs = st.sidebar.selectbox(
         "請選擇語言",
         #options=['泰雅','布農','阿美','撒奇萊雅','噶瑪蘭','魯凱','排灣','卑南',
@@ -146,6 +148,18 @@ def main():
 )
   # download link for .csv file
   st.markdown(get_table_download_link(filt_df), unsafe_allow_html=True)
+
+  output = BytesIO()
+  with pd.ExcelWriter(output) as writer:
+    filt_df.to_excel(writer)
+
+  st.download_button(
+        label="下載查詢結果 (.xlsx檔)",
+        data=output.getvalue(),
+        file_name="result.xlsx",
+        mime="application/vnd.ms-excel"
+  )
+
 
 
 
