@@ -13,17 +13,20 @@ from io import BytesIO
 
 def main():
   st.set_page_config(layout="wide")
-  st.title("台灣南島語-華語句庫資料集")
-  st.subheader("Dataset of Formosan-Mandarin sentence pairs")
+  st.title("台灣南島語文本數位資料庫")
+  st.subheader("Formosan Digital Database")
   st.markdown(
     """
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
 
 ### 資料概要
-- Y&Y 1991: 傳說故事精選輯
-- Rau 1992: Atayal texts with English tranaslation
-- Huang 1994: Ergativity in Atayal
-- 泰雅族大嵙崁群的部落故事 (尚未完整)
+- 泰雅爾族傳說故事精選輯: Y&Y (1991), 20 stories with Mandarin translation
+- Rau (1992): 6 stories with English translation in Appendix
+- Huang (1994): a story in Appendix, English translation
+- 泰雅族大嵙崁群的部落故事: 
+- 復興鄉泰雅族故事(一): 16 stories with Mandarin translation
+- 復興鄉泰雅族故事(二): 20 stories with Mandarin translation
+
 
 (⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有)
 
@@ -172,7 +175,7 @@ def main():
 @st.cache
 def get_data():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221102.pkl', compression="gzip")
+  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221115.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
