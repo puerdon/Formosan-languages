@@ -20,12 +20,17 @@ def main():
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
 
 ### 資料概要
-- 泰雅爾族傳說故事精選輯: Y&Y (1991), 20 stories with Mandarin translation
-- Rau (1992): 6 stories with English translation in Appendix
-- Huang (1994): a story in Appendix, English translation
-- 泰雅族大嵙崁群的部落故事: 
-- 復興鄉泰雅族故事(一): 16 stories with Mandarin translation
+- Egerod (1969): a conversation with English translation (TBD)
+- Egerod (1974): a conversation with English translation (TBD)
+- Rau (1992): 6 stories with English translation
+- Rau et al. (1995): 5 stories with Mandarin translation (TBD)
+- Huang (1993): a conversation with English translation (TBD)
+- Huang (1994): a story with English translation
+- 泰雅爾族傳說故事精選輯 (Y&Y 1991): 20 stories with Mandarin translation
+- 泰雅族大嵙崁群的部落故事: 17 stories with Mandarin translation
+- 復興鄉泰雅族故事(一): 20 stories with Mandarin translation
 - 復興鄉泰雅族故事(二): 20 stories with Mandarin translation
+- 和平鄉泰雅族故事: 26 stories with Mandarin translation (TBD)
 
 
 (⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有)
@@ -34,11 +39,15 @@ def main():
 - 🔭 過濾：使用左側欄功能選單可過濾資料來源(可多選)與語言，也可使用華語或族語進行關鍵詞查詢。
   - 🔍 關鍵詞查詢支援[正則表達式](https://zh.wikipedia.org/zh-tw/正则表达式)。
   - 🥳 族語範例: 
-    + 使用`cia *`查詢布農語，能找到包含`danumcia`、`luduncia`或`siulcia`等詞的句子。
-    + 使用`[a-z]{15,}`查詢任何族語，能找到包含15個字母以上單詞的句子，方便過濾長詞。
+    + 搜尋以 mn 開頭的句子：輸入`^mn`。
+    + 由於半形的`.`和`?`在正則表達式有特殊功能，因此若要搜尋出現在文本中的半形句點和問號。請在前方加上反斜線(backslash):`\.`和`\?`。搜尋逗號、冒號、驚嘆號毋須加上反斜線。
+    + 搜尋作為單詞的 aki ，而非包含有aki的詞彙，請將單詞包在兩個`\b`之間：`\baki\b`（`\b`意為 word boundary）。
+    + 搜尋所有以 mn 開頭的單詞：輸入`\bmn`。
+    + 搜尋所有的 ga (泰雅主題標記)：輸入`\bga[ ,!\.\?]`。(這串搜尋的意義是:ga前面為word boundary，而ga的後面可以出現空格、逗號、驚嘆號、句號或問號其中之一。)
+    + 搜尋單詞 ini 或 `ini'`：輸入`\bini'?\b`
   - 🤩 華語範例: 
-    + 使用`^有一`查詢華語，能找到使用`有一天`、`有一塊`或`有一晚`等詞出現在句首的句子。
-    + 使用`[0-9]{1,}`查詢華語，能找到包含羅馬數字的句子，如`我今年16歲了`。
+    + 找出以「可能」作為開頭的句子：輸入`^可能`。
+    + 找出「了」出現在句尾的句子：輸入`了$`。
 - 📚 排序：點選標題列。例如點選`族語`欄位標題列內的任何地方，資料集便會根據族語重新排序。
 
 """
@@ -175,7 +184,7 @@ def main():
 @st.cache
 def get_data():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221117.pkl', compression="gzip")
+  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_202211.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
