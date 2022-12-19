@@ -21,7 +21,7 @@ def main():
 
 ### 資料概要
 - Egerod (1969): a conversation with English translation (TBD)
-- Egerod (1974): a conversation with English translation (TBD)
+- Egerod (1974): a conversation with English translation
 - Rau (1992): 6 stories with English translation
 - Rau et al. (1995): 5 stories with Mandarin translation (TBD)
 - Huang (1993): a conversation with English translation (TBD)
@@ -184,7 +184,7 @@ def main():
 @st.cache
 def get_data():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221207.pkl', compression="gzip")
+  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221219.pkl', compression="gzip")
   df = df.astype(str, errors='ignore')
   df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
   df = df.applymap(lambda x: x.strip())
