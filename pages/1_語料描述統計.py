@@ -14,10 +14,10 @@ def get_data():
   df = df[~filt]
   return df
 
- df = get_data()
+df = get_data()
 
- df['word_count'] = df['Ab'].str.split(' ').str.len()
- df['sent_count'] = df['Ab'].astype('str').apply(lambda s: len(sent_tokenize(s)))
- summarized_df = df.groupby(['From']).sum()
- 
- summarized_df
+df['word_count'] = df['Ab'].str.split(' ').str.len()
+df['sent_count'] = df['Ab'].astype('str').apply(lambda s: len(sent_tokenize(s)))
+summarized_df = df.groupby(['From']).sum()
+
+summarized_df
