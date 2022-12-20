@@ -11,6 +11,6 @@ def get_basic_stats():
   df = pd.read_pickle('basic_stats.pkl', compression="gzip")
   return df
 
-df = get_data()
+df_basic_stats = get_basic_stats()
 
-df
+df_basic_stats
