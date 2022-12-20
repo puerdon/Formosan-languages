@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.markdown("# 語料描述統計")
 
