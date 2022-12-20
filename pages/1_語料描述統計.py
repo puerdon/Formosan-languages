@@ -6,22 +6,11 @@ st.markdown("# 語料描述統計")
 
 # Cache the raw data and profile report to speed up subseuqent requests 
 @st.cache
-def get_data():
+def get_basic_stats():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('data/Formosan-Mandarin_sent_pairs_20221219.pkl', compression="gzip")
-  df = df.astype(str, errors='ignore')
-  df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-  df = df.applymap(lambda x: x.strip())
-  filt = df.Ch.apply(len) < 5
-  df = df[~filt]
+  df = pd.read_pickle('basic_stats.pkl', compression="gzip")
   return df
 
 df = get_data()
 
-# df
-
-df['總詞數(族語)'] = df['族語'].str.split(' ').str.len()
-df['總句數(族語)'] = df['族語'].astype('str').apply(lambda s: len(sent_tokenize(s)))
-summarized_df = df.groupby(['From']).sum()
-
-summarized_df
+df
