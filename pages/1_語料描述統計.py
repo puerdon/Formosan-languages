@@ -8,7 +8,7 @@ st.markdown("# 語料描述統計")
 @st.cache
 def get_basic_stats():
   # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-  df = pd.read_pickle('basic_stats.pkl', compression="gzip")
+  df = pd.read_pickle('data/basic_stats.pkl', compression="gzip")
   return df
 
 df_basic_stats = get_basic_stats()
