@@ -26,6 +26,7 @@ def main():
 - Rau et al. (1995): 5 stories with Mandarin translation
 - Huang (1993): a conversation with English translation
 - Huang (1994): a story with English translation
+- Huang & Wu (2016): 2 stories with Mandarin translation
 - 泰雅爾族傳說故事精選輯 (Y&Y 1991): 20 stories with Mandarin translation
 - 泰雅族大嵙崁群的部落故事: 17 stories with Mandarin translation
 - 復興鄉泰雅族故事(一): 20 stories with Mandarin translation
