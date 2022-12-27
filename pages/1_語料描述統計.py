@@ -18,12 +18,12 @@ st.markdown(hide_table_row_index, unsafe_allow_html=True)
 # Cache the raw data and profile report to speed up subseuqent requests 
 @st.cache
 def get_basic_stats():
-  d = pd.read_pickle('data/stats_of_each_text_20221228-2.pkl', compression="gzip")
+  d = pd.read_pickle('data/stats_of_each_text_20221228-3.pkl', compression="gzip")
   return d
 
 @st.cache
 def get_each_text_stats():
-  d = pd.read_pickle('data/stats_of_each_text_with_subtext_20221228-2.pkl', compression="gzip")
+  d = pd.read_pickle('data/stats_of_each_text_with_subtext_20221228-3.pkl', compression="gzip")
   return d
 
 df_basic_stats = get_basic_stats()
