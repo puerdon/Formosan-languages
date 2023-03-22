@@ -15,16 +15,20 @@ hide_table_row_index = """
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
 
-# Cache the raw data and profile report to speed up subseuqent requests 
-@st.cache
+# Cache the raw data and profile report to speed up subseuqent requests
+@st.cache_data
 def get_basic_stats():
-  d = pd.read_pickle('data/stats_of_each_text_20221228-3.pkl', compression="gzip")
-  return d
+    d = pd.read_pickle(
+        'data/stats_of_each_text_20230321.pkl', compression="gzip")
+    return d
 
-@st.cache
+
+@st.cache_data
 def get_each_text_stats():
-  d = pd.read_pickle('data/stats_of_each_text_with_subtext_20221228-3.pkl', compression="gzip")
-  return d
+    d = pd.read_pickle(
+        'data/stats_of_each_text_with_subtext_20221228-3.pkl', compression="gzip")
+    return d
+
 
 df_basic_stats = get_basic_stats()
 
