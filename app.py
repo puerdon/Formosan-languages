@@ -7,15 +7,21 @@ import re
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
+# Read sheet from Google
+from streamlit_gsheets import GSheetsConnection
 
 import xlsxwriter
 from io import BytesIO
 
 
 def main():
+
     st.set_page_config(layout="wide")
     st.title("台灣南島語文本數位資料庫")
     st.subheader("Formosan Digital Database")
+    
+    
+        
     st.markdown(
         """
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
@@ -54,7 +60,15 @@ def main():
 """
     )
     # fetch the raw data
-    df = get_data()
+    # df = get_data()
+    # Connecting to google sheet
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    df = conn.read()
+    df = df.astype(str, errors='ignore')
+    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+    df = df.applymap(lambda x: x.strip())
+    filt = df.Ch.apply(len) < 5
+    df = df[~filt]
     # pd.set_option('max_colwidth', 600)
 
     def a(langs):
