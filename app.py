@@ -13,34 +13,40 @@ from streamlit_gsheets import GSheetsConnection
 import xlsxwriter
 from io import BytesIO
 
+LANG_ENG_TABLE = {
+"阿美":"Amis",
+"泰雅":"Atayal",
+"排灣":"Paiwan",
+"布農":"Bunun",
+"卑南":"Puyuma",
+"魯凱":"Rukai",
+"鄒":"Tsou",
+"卡那卡那富":"Kanakanavu",
+"拉阿魯哇":"Saaroa",
+"賽夏":"Saisiyat",
+"雅美":"Yami",
+"邵":"Thao",
+"噶瑪蘭":"Kavalan",
+"太魯閣":"Truku",
+"撒奇萊雅":"Sakizaya",
+"賽德克":"Seediq"
+}
+
+# Initialization
+# if 'last_update_time' not in st.session_state:
+#     st.session_state['last_update_time'] = 0
 
 def main():
-
+    
     st.set_page_config(layout="wide")
     st.title("台灣南島語文本數位資料庫")
     st.subheader("Formosan Digital Database")
     
+    # st.write(st.session_state['last_update_time'])
     
-        
     st.markdown(
         """
-![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
-
-### 資料概要
-- Egerod (1969): a conversation with English translation
-- Egerod (1974): a conversation with English translation
-- Rau (1992): 6 stories with English translation
-- Rau et al. (1995): 5 stories with Mandarin translation
-- Huang (1993): a conversation with English translation
-- Huang & Wu (2016): 2 stories with Mandarin translation
-- 泰雅爾族傳說故事精選輯 (Y&Y 1991): 20 stories with Mandarin translation
-- 泰雅族大嵙崁群的部落故事: 17 stories with Mandarin translation
-- 復興鄉泰雅族故事(一): 20 stories with Mandarin translation
-- 復興鄉泰雅族故事(二): 20 stories with Mandarin translation
-- 和平鄉泰雅族故事: 26 stories with Mandarin translation (TBD)
-
-
-(⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有)
+⚠️ 此查詢系統僅供教學與研究之用，內容版權歸原始資料提供者所有
 
 ### 查詢方法
 - 🔭 過濾：使用左側欄功能選單可過濾資料來源(可多選)與語言，也可使用華語或族語進行關鍵詞查詢。
@@ -59,31 +65,25 @@ def main():
 
 """
     )
-    # fetch the raw data
-    # df = get_data()
-    # Connecting to google sheet
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    df = conn.read()
-    df = df.astype(str, errors='ignore')
-    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-    df = df.applymap(lambda x: x.strip())
-    filt = df.Ch.apply(len) < 5
-    df = df[~filt]
+
+    # check last updated time:
+    last_update_timestamp = get_last_updated_timestamp()
+    df = load_data(last_update_timestamp)
+
+    # df = pd.concat([df, user_df], ignore_index=True)
     # pd.set_option('max_colwidth', 600)
 
-    def a(langs):
-        if langs != '泰雅':
-            return ['詞典', '文法', '句型', '生活會話', '九階教材']
-        else:
-            return list(source_set)
-
     # remap column names
-    zh_columns = {'Lang_En': 'Language', 'Lang_Ch': '語言_方言',
-                  'Ab': '族語', 'Ch': '華語', 'From': '來源'}
+    zh_columns = {
+        'Lang_En': 'Language',
+        'Lang_Ch': '語言_方言',
+        'Ab': '族語',
+        'Ch': '華語',
+        'From': '來源'
+    }
     df.rename(columns=zh_columns, inplace=True)
 
     # set up filtering options
-    source_set = df['來源'].unique()
     langs = st.sidebar.selectbox(
         "請選擇語言",
         options=['泰雅', '布農', '阿美', '撒奇萊雅', '噶瑪蘭', '魯凱', '排灣', '卑南',
@@ -93,10 +93,9 @@ def main():
 
     sources = st.sidebar.multiselect(
         "請選擇資料來源",
-        options=a(langs),
-        default=a(langs))
-
-    # options=['泰雅'],)
+        options=df[df['Language'] == LANG_ENG_TABLE[langs]]['來源'].unique(),
+        default=df[df['Language'] == LANG_ENG_TABLE[langs]]['來源'].unique())
+    
     texts = st.sidebar.radio(
         "請選擇關鍵詞查詢文字類別",
         options=['族語', '華語'],)
@@ -164,7 +163,6 @@ def main():
   """)
 
     # CSS to inject contained in a string
-    # CSS to inject contained in a string
     hide_dataframe_row_index = """
             <style>
             .row_heading.level0 {display:none}
@@ -229,18 +227,75 @@ def main():
 # Cache the raw data and profile report to speed up subseuqent requests
 
 
+# @st.cache_data
+# def get_data():
+    
+#     # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
+#     # df = pd.read_pickle(
+#     #     'data/Formosan-Mandarin_sent_pairs_20230321.pkl', compression="gzip")
+#     # df = df.astype(str, errors='ignore')
+#     # df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+#     # df = df.applymap(lambda x: x.strip())
+#     # filt = df.Ch.apply(len) < 5
+#     # df = df[~filt]
+#     df = get_df_from_google()
+#     return df
+
+
+def load_data(update_timestamp):
+    # update_timestamp = get_last_updated_timestamp()
+    return cached_data_load(update_timestamp)
+
 @st.cache_data
-def get_data():
-    # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-    df = pd.read_pickle(
-        'data/Formosan-Mandarin_sent_pairs_20230321.pkl', compression="gzip")
+def cached_data_load(timestamp):
+    # Connecting to google sheet
+    conn = st.connection("gsheets", type=GSheetsConnection)
+
+    df = conn.read(worksheet="main corpus", ttl=0)
     df = df.astype(str, errors='ignore')
     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
     df = df.applymap(lambda x: x.strip())
     filt = df.Ch.apply(len) < 5
     df = df[~filt]
-    return df
 
+    user_df = conn.read(worksheet="user corpus", ttl=0)
+    user_df = user_df.astype(str, errors='ignore')
+    user_df = user_df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+    user_df = user_df.applymap(lambda x: x.strip())
+    filt = user_df.Ch.apply(len) < 5
+    user_df = user_df[~filt]
+
+    result_df = df._append(user_df, ignore_index=True)
+    return result_df
+
+
+def get_last_updated_timestamp():
+    # Connecting to google sheet
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    last_ = conn.read(worksheet="last updated", ttl=0)
+    last_update_timestamp = int(last_.time[0])
+    return last_update_timestamp
+
+# def get_df_from_google():
+#     # Connecting to google sheet
+#     conn = st.connection("gsheets", type=GSheetsConnection)
+
+#     df = conn.read(worksheet="main corpus", ttl=0)
+#     df = df.astype(str, errors='ignore')
+#     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+#     df = df.applymap(lambda x: x.strip())
+#     filt = df.Ch.apply(len) < 5
+#     df = df[~filt]
+
+#     user_df = conn.read(worksheet="user corpus", ttl=0)
+#     user_df = user_df.astype(str, errors='ignore')
+#     user_df = user_df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+#     user_df = user_df.applymap(lambda x: x.strip())
+#     filt = user_df.Ch.apply(len) < 5
+#     user_df = user_df[~filt]
+
+#     result_df = df._append(user_df, ignore_index=True)
+#     return result_df
 
 # @st.cache_data
 # def get_report():
