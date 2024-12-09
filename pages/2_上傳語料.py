@@ -171,7 +171,7 @@ lang_option = st.selectbox("語言別",list(LANG_TABLE))
 dialect_option = st.selectbox("方言別", options=LANG_TABLE[lang_option])
 dialect_option = dialect_option.rstrip(lang_option)
 name = st.text_input("語料主來源標題")
-sub_name = st.text_input("語料子標題")
+# sub_name = st.text_input("語料子標題")
 password = st.text_input("上傳密碼")
 
 # st.write("語言別:", lang_option)
@@ -188,7 +188,7 @@ if st.button('update') and password == st.secrets["upload_pwd"]:
     all_sentences['Lang_En'] = LANG_ENG_TABLE[lang_option]
     all_sentences['Lang_Ch'] = lang_option[:-1] + '_' + dialect_option if dialect_option != '' else lang_option[:-1]
     all_sentences['From'] = name
-    all_sentences['Source'] = [sub_name + "_" + str(i) for i in range(1, len(all_sentences) + 1)]
+    all_sentences['Source'] = ["_" + str(i) for i in range(1, len(all_sentences) + 1)]
     result_df = pd.concat([original_df, all_sentences], ignore_index=True)
 
     with st.spinner('上傳語料中...'):

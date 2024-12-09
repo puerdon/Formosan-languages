@@ -1,8 +1,4 @@
-![visitors](https://visitor-badge.glitch.me/badge?page_id=howard-haowen.Formosan-languages)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/howard-haowen/Formosan-languages/HEAD)
-
 # 台灣南島語-華語句庫資料集(Dataset of Formosan-Mandarin sentence pairs)
-[點我進入互動式查詢系統](https://share.streamlit.io/howard-haowen/formosan-languages/main/app.py)
 
 ## 資料概要
 - 🎢 資料集合計約13萬筆台灣南島語-華語句對
