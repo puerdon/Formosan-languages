@@ -251,12 +251,13 @@ def cached_data_load(timestamp):
     # Connecting to google sheet
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    df = conn.read(worksheet="main corpus", ttl=0)
-    df = df.astype(str, errors='ignore')
-    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-    df = df.applymap(lambda x: x.strip())
-    filt = df.Ch.apply(len) < 5
-    df = df[~filt]
+    # df = conn.read(worksheet="main corpus", ttl=0)
+    # df = df.astype(str, errors='ignore')
+    # df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+    # df = df.applymap(lambda x: x.strip())
+    # filt = df.Ch.apply(len) < 5
+    # df = df[~filt]
+    df = cached_main_corpus()
 
     user_df = conn.read(worksheet="user corpus", ttl=0)
     user_df = user_df.astype(str, errors='ignore')
@@ -267,6 +268,20 @@ def cached_data_load(timestamp):
 
     result_df = df._append(user_df, ignore_index=True)
     return result_df
+
+@st.cache_data
+def cached_main_corpus():
+    # Connecting to google sheet
+    conn = st.connection("gsheets", type=GSheetsConnection)
+
+    df = conn.read(worksheet="main corpus", ttl=0)
+    df = df.astype(str, errors='ignore')
+    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+    df = df.applymap(lambda x: x.strip())
+    filt = df.Ch.apply(len) < 5
+    df = df[~filt]
+
+    return df
 
 
 def get_last_updated_timestamp():
