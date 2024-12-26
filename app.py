@@ -1,5 +1,6 @@
 import pandas as pd
 import base64
+import hmac
 import streamlit as st
 import streamlit.components.v1 as components
 import re
@@ -12,6 +13,30 @@ from streamlit_gsheets import GSheetsConnection
 
 import xlsxwriter
 from io import BytesIO
+
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Don't store the password.
+        else:
+            st.session_state["password_correct"] = False
+
+    # Return True if the password is validated.
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # Show input for password.
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+    return False
+
 
 LANG_ENG_TABLE = {
 "阿美":"Amis",
@@ -37,6 +62,9 @@ LANG_ENG_TABLE = {
 #     st.session_state['last_update_time'] = 0
 
 def main():
+
+    if not check_password():
+        st.stop()  # Do not continue if check_password is not True.
     
     st.set_page_config(layout="wide")
     st.title("台灣南島語文本數位資料庫")
@@ -224,72 +252,56 @@ def main():
     # report = get_report()
     # components.html(report, width=800, height=800, scrolling=True)
 
-# Cache the raw data and profile report to speed up subseuqent requests
-
-
-# @st.cache_data
-# def get_data():
-    
-#     # df = pd.read_pickle('Formosan-Mandarin_sent_pairs_139023entries.pkl')
-#     # df = pd.read_pickle(
-#     #     'data/Formosan-Mandarin_sent_pairs_20230321.pkl', compression="gzip")
-#     # df = df.astype(str, errors='ignore')
-#     # df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-#     # df = df.applymap(lambda x: x.strip())
-#     # filt = df.Ch.apply(len) < 5
-#     # df = df[~filt]
-#     df = get_df_from_google()
-#     return df
 
 
 def load_data(update_timestamp):
+    df_main = cached_data_load(update_timestamp['main corpus'], 'main corpus')
+    df_user = cached_data_load(update_timestamp['user corpus'], 'user corpus')
+
+    return df_main._append(df_user, ignore_index=True)
+    
     # update_timestamp = get_last_updated_timestamp()
-    return cached_data_load(update_timestamp)
+    # return cached_data_load(update_timestamp)
 
 @st.cache_data
-def cached_data_load(timestamp):
+def cached_data_load(timestamp, corpus):
     # Connecting to google sheet
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    # df = conn.read(worksheet="main corpus", ttl=0)
-    # df = df.astype(str, errors='ignore')
-    # df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-    # df = df.applymap(lambda x: x.strip())
-    # filt = df.Ch.apply(len) < 5
-    # df = df[~filt]
-    df = cached_main_corpus()
-
-    user_df = conn.read(worksheet="user corpus", ttl=0)
-    user_df = user_df.astype(str, errors='ignore')
-    user_df = user_df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-    user_df = user_df.applymap(lambda x: x.strip())
-    filt = user_df.Ch.apply(len) < 5
-    user_df = user_df[~filt]
-
-    result_df = df._append(user_df, ignore_index=True)
-    return result_df
-
-@st.cache_data
-def cached_main_corpus():
-    # Connecting to google sheet
-    conn = st.connection("gsheets", type=GSheetsConnection)
-
-    df = conn.read(worksheet="main corpus", ttl=0)
+    df = conn.read(worksheet=corpus, ttl=0)
     df = df.astype(str, errors='ignore')
     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
     df = df.applymap(lambda x: x.strip())
     filt = df.Ch.apply(len) < 5
     df = df[~filt]
 
+    # result_df = df._append(user_df, ignore_index=True)
     return df
+
+# @st.cache_data
+# def cached_main_corpus():
+#     # Connecting to google sheet
+#     conn = st.connection("gsheets", type=GSheetsConnection)
+
+#     df = conn.read(worksheet="main corpus", ttl=0)
+#     df = df.astype(str, errors='ignore')
+#     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+#     df = df.applymap(lambda x: x.strip())
+#     filt = df.Ch.apply(len) < 5
+#     df = df[~filt]
+
+#     return df
 
 
 def get_last_updated_timestamp():
     # Connecting to google sheet
     conn = st.connection("gsheets", type=GSheetsConnection)
     last_ = conn.read(worksheet="last updated", ttl=0)
-    last_update_timestamp = int(last_.time[0])
-    return last_update_timestamp
+    result = {
+        "main corpus": last_['main corpus'][0],
+        "user corpus": last_['user corpus'][0]
+    }
+    return result
 
 # def get_df_from_google():
 #     # Connecting to google sheet
