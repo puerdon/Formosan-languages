@@ -194,7 +194,10 @@ if st.button('update') and password == st.secrets["upload_pwd"]:
     with st.spinner('上傳語料中...'):
         conn.update(worksheet="user corpus", data=result_df)
         last_update_time = conn.read(worksheet="last updated", ttl=0)
-        current_time = {'time': [int(time.time())]}
-        conn.update(worksheet="last updated", data=pd.DataFrame.from_dict(current_time))
+        # last_update_time['user corpus'][0] = int(time.time())
+
+        last_update_time.loc[0, "user corpus"] = int(time.time())
+        # current_time = {'time': [int(time.time())]}
+        conn.update(worksheet="last updated", data=pd.DataFrame.from_dict(last_update_time))
     st.success('上傳成功!', icon="✅")
 
