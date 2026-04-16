@@ -270,7 +270,7 @@ def cached_data_load(timestamp, corpus):
 
     df = conn.read(worksheet=corpus, ttl=0)
     df = df.astype(str, errors='ignore')
-    df = df.map(lambda x: x[1:] if x.startswith(".") else x)
+    df = df.map(lambda x: x[1:] if isinstance(x, str) and x.startswith(".") else x)
     df = df.map(lambda x: x.strip())
     filt = df.Ch.apply(len) < 5
     df = df[~filt]
