@@ -258,9 +258,9 @@ def load_data(update_timestamp):
     df_main = cached_data_load(update_timestamp['main corpus'], 'main corpus')
     df_user = cached_data_load(update_timestamp['user corpus'], 'user corpus')
     
-    # return df_main._append(df_user, ignore_index=True)
+    return df_main._append(df_user, ignore_index=True)
     # df = 
-    return pd.concat([df_main, df_user], ignore_index=True)
+    # return pd.concat([df_main, df_user], ignore_index=True)
     
     # update_timestamp = get_last_updated_timestamp()
     # return cached_data_load(update_timestamp)
@@ -271,11 +271,13 @@ def cached_data_load(timestamp, corpus):
     conn = st.connection("gsheets", type=GSheetsConnection)
 
     df = conn.read(worksheet=corpus, ttl=0)
-    # df = df.astype(str, errors='ignore')
+    df = df.astype(str, errors='ignore')
     # df = df.map(lambda x: x[1:] if isinstance(x, str) and x.startswith(".") else x)
     # df = df.astype(str).map(lambda x: x[1:] if x.startswith(".") else x)
-    df = df.fillna("").astype(str).map(lambda x: x[1:] if x.startswith(".") else x)
-    df = df.map(lambda x: x.strip())
+    # df = df.fillna("").astype(str).map(lambda x: x[1:] if x.startswith(".") else x)
+    # df = df.map(lambda x: x.strip())
+    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
+    df = df.applymap(lambda x: x.strip())
     filt = df.Ch.apply(len) < 5
     df = df[~filt]
 
