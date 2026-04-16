@@ -259,8 +259,8 @@ def load_data(update_timestamp):
     df_user = cached_data_load(update_timestamp['user corpus'], 'user corpus')
     
     # return df_main._append(df_user, ignore_index=True)
-    df = pd.concat([df_main, df_user], ignore_index=True)
-    return df
+    # df = 
+    return pd.concat([df_main, df_user], ignore_index=True)
     
     # update_timestamp = get_last_updated_timestamp()
     # return cached_data_load(update_timestamp)
