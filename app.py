@@ -270,8 +270,8 @@ def cached_data_load(timestamp, corpus):
 
     df = conn.read(worksheet=corpus, ttl=0)
     df = df.astype(str, errors='ignore')
-    df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-    df = df.applymap(lambda x: x.strip())
+    df = df.map(lambda x: x[1:] if x.startswith(".") else x)
+    df = df.map(lambda x: x.strip())
     filt = df.Ch.apply(len) < 5
     df = df[~filt]
 
@@ -285,8 +285,8 @@ def cached_data_load(timestamp, corpus):
 
 #     df = conn.read(worksheet="main corpus", ttl=0)
 #     df = df.astype(str, errors='ignore')
-#     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-#     df = df.applymap(lambda x: x.strip())
+#     df = df.map(lambda x: x[1:] if x.startswith(".") else x)
+#     df = df.map(lambda x: x.strip())
 #     filt = df.Ch.apply(len) < 5
 #     df = df[~filt]
 
@@ -309,15 +309,15 @@ def get_last_updated_timestamp():
 
 #     df = conn.read(worksheet="main corpus", ttl=0)
 #     df = df.astype(str, errors='ignore')
-#     df = df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-#     df = df.applymap(lambda x: x.strip())
+#     df = df.map(lambda x: x[1:] if x.startswith(".") else x)
+#     df = df.map(lambda x: x.strip())
 #     filt = df.Ch.apply(len) < 5
 #     df = df[~filt]
 
 #     user_df = conn.read(worksheet="user corpus", ttl=0)
 #     user_df = user_df.astype(str, errors='ignore')
-#     user_df = user_df.applymap(lambda x: x[1:] if x.startswith(".") else x)
-#     user_df = user_df.applymap(lambda x: x.strip())
+#     user_df = user_df.map(lambda x: x[1:] if x.startswith(".") else x)
+#     user_df = user_df.map(lambda x: x.strip())
 #     filt = user_df.Ch.apply(len) < 5
 #     user_df = user_df[~filt]
 
